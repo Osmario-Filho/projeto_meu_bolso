@@ -1,0 +1,12 @@
+{
+  // Converte a tecla Tab para 2 espaços
+  "editor.tabSize": 2,
+
+  // Garante que espaços são inseridos em vez de caracteres de tabulação
+  "editor.insertSpaces": true,
+
+  // (Recomendado) Desativa a detecção automática de indentação
+  // para forçar o padrão do projeto e evitar que o VS Code
+  // adivinhe a formatação de um arquivo e ignore as regras acima.
+  "editor.detectIndentation": false
+}
