@@ -7,9 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { Transaction } from '../../transactions/entities/transaction.entity';
-import { Budget } from '../../budgets/entities/budget.entity';
+import { User, Transaction, Budget } from '../../database/entities';
 
 @Entity({ name: 'categories' })
 export class Category {

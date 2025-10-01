@@ -1,8 +1,13 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { BudgetsService } from './budgets.service';
 import { BudgetsController } from './budgets.controller';
+import { Budget } from './entities/budget.entity';
+import { User } from '../users/entities/user.entity';
+import { Category } from '../categories/entities/category.entity';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Budget, User, Category])],
   controllers: [BudgetsController],
   providers: [BudgetsService],
 })

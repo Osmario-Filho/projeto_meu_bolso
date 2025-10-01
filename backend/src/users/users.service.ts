@@ -4,14 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
+// import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly hashingService: HashingServiceProtocol,
+    // private readonly hashingService: HashingServiceProtocol,
   ) {}
 
   create(createUserDto: CreateUserDto) {

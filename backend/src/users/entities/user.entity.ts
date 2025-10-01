@@ -1,7 +1,5 @@
-import { Budget } from 'src/budgets/entities/budget.entity';
 import { Entity, OneToMany } from 'typeorm';
-import { Category } from 'src/categories/entities/category.entity';
-import { Transaction } from 'src/transactions/entities/transaction.entity';
+import { Category, Transaction, Budget } from '../../database/entities';
 import {
   PrimaryGeneratedColumn,
   Column,
