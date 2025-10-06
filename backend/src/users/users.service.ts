@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { find } from 'rxjs';
 // import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
 
 @Injectable({ scope: Scope.DEFAULT })
@@ -14,20 +15,42 @@ export class UsersService {
     // private readonly hashingService: HashingServiceProtocol,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.userRepository.findOneBy({
+      email: createUserDto.email,
+    });
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+
+    const newUser = this.userRepository.create({
+      ...createUserDto,
+    });
+    return await this.userRepository.save(newUser);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    const findedUser = await this.userRepository.findOneBy({ email });
+    if (!findedUser) {
+      throw new Error('User not found');
+    }
+    return findedUser;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(email: string, updateUserDto: UpdateUserDto) {
+    const findedUser = await this.userRepository.preload({
+      email: email,
+      ...updateUserDto,
+    });
+    if (!findedUser) {
+      throw new Error('User not found');
+    }
+
+    return await this.userRepository.save(findedUser);
   }
 
   remove(id: number) {
