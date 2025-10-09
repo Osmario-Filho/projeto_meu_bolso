@@ -6,7 +6,7 @@
 GET {{baseUrl}}/users
 
 ###USERS GET ONE
-GET {{baseUrl}}/users/teste2@email.com
+GET {{baseUrl}}/users/teste@email.com
 
 ###USERS POST ONE 
 POST {{baseUrl}}/users
@@ -14,13 +14,12 @@ Content-Type: application/json
 
 {
   "name": "Teste",
-  "email": "teste2@email.com",
-  "password": "password123",
-  "coisaErrada": "coisaErrada"
+  "email": "teste@email.com",
+  "password": "password123"
 }
 
 ###USERS PATCH ONE  
-PATCH {{baseUrl}}/users/teste@gmail.com
+PATCH {{baseUrl}}/users/teste2@email.com
 Content-Type: application/json
 
 {
@@ -30,3 +29,15 @@ Content-Type: application/json
 
 ###USERS DELETE ONE
 DELETE {{baseUrl}}/users/1
+
+
+
+
+###Auth POST ONE 
+POST {{baseUrl}}/auth
+Content-Type: application/json
+
+{
+  "email": "teste@email.com",
+  "password": "password123"
+}

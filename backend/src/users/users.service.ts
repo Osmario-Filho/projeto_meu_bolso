@@ -1,18 +1,17 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { ConflictException, Injectable, Scope } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { find } from 'rxjs';
-// import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
+import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    // private readonly hashingService: HashingServiceProtocol,
+    private readonly hashingService: HashingServiceProtocol,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -20,11 +19,12 @@ export class UsersService {
       email: createUserDto.email,
     });
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new ConflictException('User with this email already exists');
     }
-
+    const passwordHash = await this.hashingService.hash(createUserDto.password);
     const newUser = this.userRepository.create({
       ...createUserDto,
+      passwordHash,
     });
     return await this.userRepository.save(newUser);
   }
@@ -42,9 +42,18 @@ export class UsersService {
   }
 
   async update(email: string, updateUserDto: UpdateUserDto) {
+    const dadosPessoa = {
+      nome: updateUserDto?.name,
+    };
+    if (updateUserDto?.password) {
+      const passwordHash = await this.hashingService.hash(
+        updateUserDto.password,
+      );
+      dadosPessoa['passwordHash'] = passwordHash;
+    }
     const findedUser = await this.userRepository.preload({
-      email: email,
-      ...updateUserDto,
+      email,
+      ...dadosPessoa,
     });
     if (!findedUser) {
       throw new Error('User not found');
