@@ -1,12 +1,14 @@
 @baseUrl = http://localhost:3000
 
+@authToken = {{authenticate.response.body.accessToken}}
 
-###USERS GET ALL
-
+@id = fd5faca7-c758-4bbc-9ce1-a5a640cffbab
 GET {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
 
 ###USERS GET ONE
-GET {{baseUrl}}/users/teste@email.com
+GET {{baseUrl}}/users/{{id}}
+Authorization: Bearer {{authToken}}
 
 ###USERS POST ONE 
 POST {{baseUrl}}/users
@@ -19,7 +21,8 @@ Content-Type: application/json
 }
 
 ###USERS PATCH ONE  
-PATCH {{baseUrl}}/users/teste2@email.com
+PATCH {{baseUrl}}/users/{{id}}
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
@@ -28,12 +31,14 @@ Content-Type: application/json
 }
 
 ###USERS DELETE ONE
-DELETE {{baseUrl}}/users/1
+DELETE {{baseUrl}}/users/{{id}}/
+Authorization: Bearer {{authToken}}
 
 
 
 
 ###Auth POST ONE 
+# @name authenticate
 POST {{baseUrl}}/auth
 Content-Type: application/json
 

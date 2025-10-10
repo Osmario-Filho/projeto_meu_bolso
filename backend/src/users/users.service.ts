@@ -1,10 +1,18 @@
-import { ConflictException, Injectable, Scope } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  Scope,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { HashingServiceProtocol } from '../auth/hashing/hashing.service';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { NotFoundError } from 'rxjs';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class UsersService {
@@ -33,15 +41,19 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
-  async findOne(email: string) {
-    const findedUser = await this.userRepository.findOneBy({ email });
+  async findOne(id: string) {
+    const findedUser = await this.userRepository.findOneBy({ id });
     if (!findedUser) {
-      throw new Error('User not found');
+      throw new NotFoundException(`Usuário com o ID "${id}" não encontrado.`);
     }
     return findedUser;
   }
 
-  async update(email: string, updateUserDto: UpdateUserDto) {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    tokenPayload: TokenPayloadDto,
+  ) {
     const dadosPessoa = {
       nome: updateUserDto?.name,
     };
@@ -52,17 +64,24 @@ export class UsersService {
       dadosPessoa['passwordHash'] = passwordHash;
     }
     const findedUser = await this.userRepository.preload({
-      email,
+      id,
       ...dadosPessoa,
     });
     if (!findedUser) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
-
+    if (findedUser.id !== tokenPayload.sub) {
+      throw new ForbiddenException('Você não é essa pessoa');
+    }
     return await this.userRepository.save(findedUser);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string, tokenPayload: TokenPayloadDto) {
+    const user = await this.findOne(id);
+
+    if (user.id !== tokenPayload.sub) {
+      throw new ForbiddenException('Você não é essa pessoa');
+    }
+    return this.userRepository.remove(user);
   }
 }
